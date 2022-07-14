@@ -1,53 +1,75 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import "./App.css";
 
 
-export default class App extends Component{
+export default class App extends Component {
 
-  state={
-    todoData :[
-      {
-        id:"1",
-        title:"Study",
-        completed:true
-      },
-      {
-        id:"2",
-        title:"Clean",
-        completed:false
-      }
-    ]
+  state = {
+    todoData: [
 
-  }
-  btnStyle={
-    color:"#fff",
-    border:"none",
+    ],
+    value: ""
+  };
+
+  btnStyle = {
+    color: "#fff",
+    border: "none",
     padding: "5px 9px",
-    borderRadius:"50%",
-    cursor:"pointer",
-    float:"right"
+    borderRadius: "50%",
+    cursor: "pointer",
+    float: "right"
   }
 
-  getStyle=()=> {
-    return{ 
-      padding:"10px", 
+  getStyle = (completed) => {
+    return {
+      padding: "10px",
       borderBottom: "1px #ccc dotted",
-      textDecoration:'none'
-    }
+      textDecoration: completed ? "line-through" : "none",
+    };
   }
 
 
-  handleClick=(id)=>{
-    let newtodoData = this.state.todoData.filter(data=> data.id !== id)
-    console.log('newtodoData',newtodoData )
+  handleClick = (id) => {
+    let newtodoData = this.state.todoData.filter(data => data.id !== id)
+    console.log('newtodoData', newtodoData)
 
-    this.setState({todoData:newtodoData})
+    this.setState({ todoData: newtodoData })
 
   }
 
-   
-  render(){
-    return(
+  handleChange = (e) => {
+    this.setState({ value: e.target.value })
+
+  }
+
+  handleSubmit = (e) => {
+    //form 안에 input을 전송할 때 페이지 리로드 되는 걸 막아줌 
+    e.preventDefault();
+
+    //새로운 할 일 데이터
+    let newTodo = {
+      id: Date.now(),
+      title: this.state.value,
+      completed: false,
+    };
+
+    //원래 있던 할 일에 새로운 할 일 더해주기
+    this.setState({ todoData: [...this.state.todoData, newTodo], value: "" });
+  }
+
+  handleCompleteChange = (id) => {
+    let newTodoDate = this.setState.todoData.map(data => {
+      if (data.id === id) {
+        data.completed = !data.completed;
+      }
+      return data;
+    });
+    this.setState({ todoData: newTodoDate });
+
+  }
+
+  render() {
+    return (
       <div className="container">
         <div className="todoBlock">
           <div className="title">
@@ -56,15 +78,36 @@ export default class App extends Component{
 
 
           {this.state.todoData.map((data) => (
-              <div style={this.getStyle()} key={data.id}>
-              <input type="checkbox" defaultChecked={false}></input>
-                {data.title}
-                <button style={this.btnStyle} onClick={()=> this.handleClick(data.id)}>x</button>
+            <div style={this.getStyle(data.completed)} key={data.id}>
+              <input type="checkbox" onChange={() =>
+                this.handleCompleteChange(data.id)}
+                defaultChecked={false}></input>
+              {data.title}
+              < button style={this.btnStyle} onClick={() => this.handleClick(data.id)}>x</button>
             </div>
-          ))}  
-        
-        </div>
-     </div>
+          ))
+          }
+
+          <form style={{ display: "flex" }} onSubmit={this.handleSubmit}>
+            <input
+              type="text"
+              name="value"
+              style={{ flex: "10", padding: "5px" }}
+              placeholder="해야 할 일을 입력하세요."
+              value={this.state.value}
+              onChange={this.handleChange}
+            />
+
+            <input
+              type="submit"
+              value="입력"
+              className="btn"
+              style={{ flex: '1' }}
+            />
+          </form>
+
+        </div >
+      </div >
     )
   }
 } 
